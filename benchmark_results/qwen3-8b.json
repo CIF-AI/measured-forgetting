@@ -1,0 +1,1223 @@
+[
+  {
+    "by_class": {
+      "aggregation": {
+        "baseline": 0.6666666666666666,
+        "v1": 0.6666666666666666,
+        "v2": 0.3333333333333333
+      },
+      "contradiction": {
+        "baseline": 1.0,
+        "v1": 0.0,
+        "v2": 0.14285714285714285
+      },
+      "exploratory": {
+        "baseline": 0.375,
+        "v1": 0.5,
+        "v2": 0.0
+      },
+      "lookup": {
+        "baseline": 0.3333333333333333,
+        "v1": 0.3333333333333333,
+        "v2": 2.3333333333333335
+      },
+      "multihop": {
+        "baseline": 0.0,
+        "v1": 0.1111111111111111,
+        "v2": 1.0
+      },
+      "temporal": {
+        "baseline": 0.6666666666666666,
+        "v1": 0.4444444444444444,
+        "v2": 1.3333333333333333
+      }
+    },
+    "by_dimension": {
+      "causal_fidelity": {
+        "baseline": 0.75,
+        "v1": 0.0,
+        "v2": 0.08333333333333333
+      },
+      "contradiction": {
+        "baseline": 0.3333333333333333,
+        "v1": 0.0,
+        "v2": 0.0
+      },
+      "entity_recall": {
+        "baseline": 0.0,
+        "v1": 0.5,
+        "v2": 3.0
+      },
+      "fact_retention": {
+        "baseline": 0.5384615384615384,
+        "v1": 0.6153846153846154,
+        "v2": 1.0
+      },
+      "temporal": {
+        "baseline": 0.0,
+        "v1": 0.0,
+        "v2": 1.2
+      }
+    },
+    "model": "qwen3:8b",
+    "overall": {
+      "baseline": 0.5,
+      "v1": 0.3541666666666667,
+      "v2": 0.8125
+    },
+    "scores": [
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the gold price?",
+        "scenario": "lookup-short",
+        "score": 0
+      },
+      {
+        "answer": "The weekly low for gold was not provided in the prior context, as the system response only included platinum price data.",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the weekly low for gold?",
+        "scenario": "lookup-short",
+        "score": 2
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the gold price?",
+        "scenario": "lookup-short",
+        "score": 0
+      },
+      {
+        "answer": "The weekly low for gold was not provided in",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the weekly low for gold?",
+        "scenario": "lookup-short",
+        "score": 2
+      },
+      {
+        "answer": "The gold price was $2,847.30 per troy ounce.",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the gold price?",
+        "scenario": "lookup-short",
+        "score": 3
+      },
+      {
+        "answer": "The weekly low for gold was $2,819.50.",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the weekly low for gold?",
+        "scenario": "lookup-short",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was Kenya's GDP per capita in nominal terms?",
+        "scenario": "lookup-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was Kenya's total GDP?",
+        "scenario": "lookup-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was Kenya's GDP per capita in nominal terms?",
+        "scenario": "lookup-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was Kenya's total GDP?",
+        "scenario": "lookup-medium",
+        "score": 0
+      },
+      {
+        "answer": "Kenya's GDP per capita in nominal terms is **$2,197** (2025 estimate).",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was Kenya's GDP per capita in nominal terms?",
+        "scenario": "lookup-medium",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was Kenya's total GDP?",
+        "scenario": "lookup-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was Nairobi's metropolitan area population?",
+        "scenario": "lookup-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "EntityRecall",
+        "probe": "What counties are in the Nairobi metropolitan area?",
+        "scenario": "lookup-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was Nairobi's metropolitan area population?",
+        "scenario": "lookup-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "EntityRecall",
+        "probe": "What counties are in the Nairobi metropolitan area?",
+        "scenario": "lookup-long",
+        "score": 0
+      },
+      {
+        "answer": "Nairobi's metropolitan area population is",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was Nairobi's metropolitan area population?",
+        "scenario": "lookup-long",
+        "score": 2
+      },
+      {
+        "answer": "The Nairobi metropolitan area includes the counties of Nairobi, Kiambu, Machakos, and Kajiado.",
+        "condition": "CifV2",
+        "dimension": "EntityRecall",
+        "probe": "What counties are in the Nairobi metropolitan area?",
+        "scenario": "lookup-long",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "Who is the top CHW and what is their rate?",
+        "scenario": "multihop-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "How was the 98.3% submission rate calculated?",
+        "scenario": "multihop-short",
+        "score": 0
+      },
+      {
+        "answer": "The available data does not include information about Mary Wanjiku",
+        "condition": "Baseline",
+        "dimension": "EntityRecall",
+        "probe": "Who is Mary Wanjiku's supervisor?",
+        "scenario": "multihop-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "Who is the top CHW and what is their rate?",
+        "scenario": "multihop-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "How was the 98.3% submission rate calculated?",
+        "scenario": "multihop-short",
+        "score": 0
+      },
+      {
+        "answer": "The information provided does not mention Mary Wanjiku or her supervisor. Please clarify or provide additional context if available.",
+        "condition": "UniformV1",
+        "dimension": "EntityRecall",
+        "probe": "Who is Mary Wanjiku's supervisor?",
+        "scenario": "multihop-short",
+        "score": 1
+      },
+      {
+        "answer": "Mary Wanjiku (CHW-4821) with",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "Who is the top CHW and what is their rate?",
+        "scenario": "multihop-short",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "How was the 98.3% submission rate calculated?",
+        "scenario": "multihop-short",
+        "score": 0
+      },
+      {
+        "answer": "David Barasa.",
+        "condition": "CifV2",
+        "dimension": "EntityRecall",
+        "probe": "Who is Mary Wanjiku's supervisor?",
+        "scenario": "multihop-short",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the sync rate decline in Kakamega?",
+        "scenario": "multihop-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was Lugari's sync rate before and after the fiber cut?",
+        "scenario": "multihop-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the top failure type and its percentage?",
+        "scenario": "multihop-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the sync rate decline in Kakamega?",
+        "scenario": "multihop-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was Lugari's sync rate before and after the fiber cut?",
+        "scenario": "multihop-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the top failure type and its percentage?",
+        "scenario": "multihop-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the sync rate decline in Kakamega?",
+        "scenario": "multihop-medium",
+        "score": 0
+      },
+      {
+        "answer": "Lugari's sync rate was **91.2% before the fiber cut (Feb 202",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was Lugari's sync rate before and after the fiber cut?",
+        "scenario": "multihop-medium",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the top failure type and its percentage?",
+        "scenario": "multihop-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "What were the two root causes of the KPI discrepancy?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "At which pipeline layer did the first gap appear?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the total discrepancy and percentage?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "What were the two root causes of the KPI discrepancy?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "At which pipeline layer did the first gap appear?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the total discrepancy and percentage?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "What were the two root causes of the KPI discrepancy?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "At which pipeline layer did the first gap appear?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the total discrepancy and percentage?",
+        "scenario": "multihop-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "What was the root cause of the deployment failure?",
+        "scenario": "exploratory-short",
+        "score": 0
+      },
+      {
+        "answer": "The resolution was to wait for Hetzner maintenance in fsn1-dc14 to",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the resolution?",
+        "scenario": "exploratory-short",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "What was the root cause of the deployment failure?",
+        "scenario": "exploratory-short",
+        "score": 0
+      },
+      {
+        "answer": "The resolution was to wait for Hetzner maintenance to complete, as the server (cif-k3s) was unreachable due to maintenance but",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the resolution?",
+        "scenario": "exploratory-short",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "What was the root cause of the deployment failure?",
+        "scenario": "exploratory-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the resolution?",
+        "scenario": "exploratory-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the forager to return empty results?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What specific query was leaking connections?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "What was the permanent fix?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the forager to return empty results?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What specific query was leaking connections?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "What was the permanent fix?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the forager to return empty results?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What specific query was leaking connections?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "The permanent fix was",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "What was the permanent fix?",
+        "scenario": "exploratory-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "What was the root cause of the NaN loss?",
+        "scenario": "exploratory-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the fix?",
+        "scenario": "exploratory-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "At what step did the NaN first appear?",
+        "scenario": "exploratory-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "What was the root cause of the NaN loss?",
+        "scenario": "exploratory-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the fix?",
+        "scenario": "exploratory-long",
+        "score": 0
+      },
+      {
+        "answer": "The NaN first appeared at step **4,218**.",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "At what step did the NaN first appear?",
+        "scenario": "exploratory-long",
+        "score": 1
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "What was the root cause of the NaN loss?",
+        "scenario": "exploratory-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the fix?",
+        "scenario": "exploratory-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "At what step did the NaN first appear?",
+        "scenario": "exploratory-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What is the total number of active CHWs across all counties?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "The prior context only provides data for Busia sub",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "How many active CHWs does Kakamega have?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "Which sub-county in Busia has the most CHWs?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What is the total number of active CHWs across all counties?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "How many active CHWs does Kakamega have?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "Which sub-county in Busia has the most CHWs?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What is the total number of active CHWs across all counties?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "How many active CHWs does Kakamega have?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "Which sub-county in Busia has the most CHWs?",
+        "scenario": "aggregation-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "How many open episodes are there in total?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What is the total financial potential across all episodes?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "How many forex episodes are open and what's their combined value?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "How many open episodes are there in total?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What is the total financial potential across all episodes?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "How many forex episodes are open and what's their combined value?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "How many open episodes are there in total?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What is the total financial potential across all episodes?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "How many forex episodes are open and what's their combined value?",
+        "scenario": "aggregation-medium",
+        "score": 0
+      },
+      {
+        "answer": "The total cost for the week was $13.80.",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the total cost for the week?",
+        "scenario": "aggregation-long",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "How many sessions were there and what was the total duration?",
+        "scenario": "aggregation-long",
+        "score": 0
+      },
+      {
+        "answer": "The most expensive session was session 2094, which involved paper writing.",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "Which session was most expensive and what was it about?",
+        "scenario": "aggregation-long",
+        "score": 3
+      },
+      {
+        "answer": "The total cost for the week was $13.80.",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the total cost for the week?",
+        "scenario": "aggregation-long",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "How many sessions were there and what was the total duration?",
+        "scenario": "aggregation-long",
+        "score": 0
+      },
+      {
+        "answer": "The most expensive session was **session 2094** (paper writing), costing **$1.24**.",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "Which session was most expensive and what was it about?",
+        "scenario": "aggregation-long",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the total cost for the week?",
+        "scenario": "aggregation-long",
+        "score": 0
+      },
+      {
+        "answer": "There were **15 sessions** with a **total",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "How many sessions were there and what was the total duration?",
+        "scenario": "aggregation-long",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "Which session was most expensive and what was it about?",
+        "scenario": "aggregation-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the two conflicting numbers?",
+        "scenario": "contradiction-short",
+        "score": 0
+      },
+      {
+        "answer": "The source database (CouchDB) is the ground truth.",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "Which source is the ground truth?",
+        "scenario": "contradiction-short",
+        "score": 3
+      },
+      {
+        "answer": "The two conflicting numbers were **1",
+        "condition": "UniformV1",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the two conflicting numbers?",
+        "scenario": "contradiction-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "Which source is the ground truth?",
+        "scenario": "contradiction-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the two conflicting numbers?",
+        "scenario": "contradiction-short",
+        "score": 0
+      },
+      {
+        "answer": "The source database (C",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "Which source is the ground truth?",
+        "scenario": "contradiction-short",
+        "score": 1
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the two different approval ratings and from which sources?",
+        "scenario": "contradiction-medium",
+        "score": 0
+      },
+      {
+        "answer": "The polls disagreed because they used different sampling methods: one (Infotrak) may underrepresent rural areas, while the other (TIFA) may not fully capture urban beneficiaries, leading to divergent results.",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "Why did the two polls disagree?",
+        "scenario": "contradiction-medium",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the estimated true approval using population weighting?",
+        "scenario": "contradiction-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the two different approval ratings and from which sources?",
+        "scenario": "contradiction-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "Why did the two polls disagree?",
+        "scenario": "contradiction-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the estimated true approval using population weighting?",
+        "scenario": "contradiction-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the two different approval ratings and from which sources?",
+        "scenario": "contradiction-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "Why did the two polls disagree?",
+        "scenario": "contradiction-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the estimated true approval using population weighting?",
+        "scenario": "contradiction-medium",
+        "score": 0
+      },
+      {
+        "answer": "The paper claimed higher performance",
+        "condition": "Baseline",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the paper's claims vs our measurements for ARC-C?",
+        "scenario": "contradiction-long",
+        "score": 1
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the discrepancy between paper and our results?",
+        "scenario": "contradiction-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the paper's claims vs our measurements for ARC-C?",
+        "scenario": "contradiction-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the discrepancy between paper and our results?",
+        "scenario": "contradiction-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "ContradictionAwareness",
+        "probe": "What were the paper's claims vs our measurements for ARC-C?",
+        "scenario": "contradiction-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the discrepancy between paper and our results?",
+        "scenario": "contradiction-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "TemporalOrdering",
+        "probe": "What was the GBP/USD rate on Wednesday (the weekly peak)?",
+        "scenario": "temporal-short",
+        "score": 0
+      },
+      {
+        "answer": "The Thursday drop was caused by the UK GDP data missing",
+        "condition": "Baseline",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the Thursday drop?",
+        "scenario": "temporal-short",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the overall weekly change?",
+        "scenario": "temporal-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "TemporalOrdering",
+        "probe": "What was the GBP/USD rate on Wednesday (the weekly peak)?",
+        "scenario": "temporal-short",
+        "score": 0
+      },
+      {
+        "answer": "The Thursday drop was caused by (1",
+        "condition": "UniformV1",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the Thursday drop?",
+        "scenario": "temporal-short",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the overall weekly change?",
+        "scenario": "temporal-short",
+        "score": 0
+      },
+      {
+        "answer": "The GBP/USD rate on Wednesday (the weekly peak) was **1.3312**.",
+        "condition": "CifV2",
+        "dimension": "TemporalOrdering",
+        "probe": "What was the GBP/USD rate on Wednesday (the weekly peak)?",
+        "scenario": "temporal-short",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "CausalFidelity",
+        "probe": "What caused the Thursday drop?",
+        "scenario": "temporal-short",
+        "score": 0
+      },
+      {
+        "answer": "The overall weekly change was a decline of **-0.69%**.",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the overall weekly change?",
+        "scenario": "temporal-short",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "TemporalOrdering",
+        "probe": "When was the Influence Equation introduced and in which version?",
+        "scenario": "temporal-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "TemporalOrdering",
+        "probe": "What version introduced Strand and when?",
+        "scenario": "temporal-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What were the first three dimensions in v0.1?",
+        "scenario": "temporal-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "TemporalOrdering",
+        "probe": "When was the Influence Equation introduced and in which version?",
+        "scenario": "temporal-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "TemporalOrdering",
+        "probe": "What version introduced Strand and when?",
+        "scenario": "temporal-medium",
+        "score": 0
+      },
+      {
+        "answer": "The first three dimensions in v0.1 were **Context**, **Influence**, and **Flow**.",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What were the first three dimensions in v0.1?",
+        "scenario": "temporal-medium",
+        "score": 1
+      },
+      {
+        "answer": "The Influence Equation was introduced in **version 1.0 (June 2025)**.",
+        "condition": "CifV2",
+        "dimension": "TemporalOrdering",
+        "probe": "When was the Influence Equation introduced and in which version?",
+        "scenario": "temporal-medium",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "TemporalOrdering",
+        "probe": "What version introduced Strand and when?",
+        "scenario": "temporal-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What were the first three dimensions in v0.1?",
+        "scenario": "temporal-medium",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "TemporalOrdering",
+        "probe": "How many deployments failed and on what dates?",
+        "scenario": "temporal-long",
+        "score": 0
+      },
+      {
+        "answer": "The longest deployment was **v3.46**, which took **120 seconds** due to the **NLLB model download**.",
+        "condition": "Baseline",
+        "dimension": "FactRetention",
+        "probe": "What was the longest deployment and why?",
+        "scenario": "temporal-long",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "Baseline",
+        "dimension": "TemporalOrdering",
+        "probe": "What was deployed on May 10?",
+        "scenario": "temporal-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "TemporalOrdering",
+        "probe": "How many deployments failed and on what dates?",
+        "scenario": "temporal-long",
+        "score": 0
+      },
+      {
+        "answer": "The longest deployment was **v3.46**, caused by the **NLLB model download**, which took **120 seconds**.",
+        "condition": "UniformV1",
+        "dimension": "FactRetention",
+        "probe": "What was the longest deployment and why?",
+        "scenario": "temporal-long",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "UniformV1",
+        "dimension": "TemporalOrdering",
+        "probe": "What was deployed on May 10?",
+        "scenario": "temporal-long",
+        "score": 0
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "TemporalOrdering",
+        "probe": "How many deployments failed and on what dates?",
+        "scenario": "temporal-long",
+        "score": 0
+      },
+      {
+        "answer": "The longest deployment was **v3.46**, which took **120 seconds** due to the **NLLB model download** during the deployment process.",
+        "condition": "CifV2",
+        "dimension": "FactRetention",
+        "probe": "What was the longest deployment and why?",
+        "scenario": "temporal-long",
+        "score": 3
+      },
+      {
+        "answer": "",
+        "condition": "CifV2",
+        "dimension": "TemporalOrdering",
+        "probe": "What was deployed on May 10?",
+        "scenario": "temporal-long",
+        "score": 0
+      }
+    ]
+  }
+]

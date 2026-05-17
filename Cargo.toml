@@ -1,0 +1,16 @@
+[package]
+name = "measured-forgetting"
+version = "0.1.0"
+edition = "2021"
+description = "Context management for agentic local LLMs — measured forgetting v1/v2 with benchmark harness"
+license = "Apache-2.0"
+repository = "https://github.com/CIF-AI/measured-forgetting"
+authors = ["Barak Achillah Asidi <research@thexi.dev>"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[[bin]]
+name = "bench-forgetting"
+path = "src/bin/bench_forgetting.rs"
