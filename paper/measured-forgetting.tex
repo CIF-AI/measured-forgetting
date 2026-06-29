@@ -82,7 +82,7 @@
 \begin{abstract}
 We present \emph{measured forgetting}, a context management method for local language models performing multi-round tool-calling on consumer hardware. Unlike cloud-hosted APIs with 128K+ context windows, local models on Apple Silicon (8B--14B parameters, 8K--16K context) exhaust their context within 3--4 tool rounds --- each round appends both a model response and a tool result. Existing approaches either impose a fixed round limit (truncating investigation prematurely) or rely on the user to manage context (shifting cognitive load away from the task).
 
-Measured forgetting treats context as a finite resource to be managed \emph{during} inference, not before it. The method monitors context utilisation in real-time, partitions the message history into three zones (pinned, compressible, recent), and invokes the model itself to compress the compressible zone into a summary --- all within the same generation loop. Version 2 extends uniform compression with three novel instruments --- an Influence Equation (multi-dimensional scoring with super-linear $\Phi(B) = B^{1.5}$ resonance), Trace Topology (causal chain preservation), and a Problem Taxonomy (task-class-adaptive compression strategy). Across 7 models from 5 independent families (Alibaba, Mistral, Meta, Google, Microsoft), V2 outperforms V1 on every model tested, with improvements ranging from +0.04 to +0.46 (out of 3.0), and the largest gains on the weakest summarisers.
+Measured forgetting treats context as a finite resource to be managed \emph{during} inference, not before it. The method monitors context utilisation in real-time, partitions the message history into three zones (pinned, compressible, recent), and invokes the model itself to compress the compressible zone into a summary --- all within the same generation loop. Version 2 extends uniform compression with three novel instruments --- an Influence Equation (multi-dimensional scoring with super-linear $\Phi(B) = B^{1.5}$ resonance), Trace Topology (causal chain preservation), and a Problem Taxonomy (task-class-adaptive compression strategy). Across 7 models from 5 independent families (Alibaba, Mistral, Meta, Google, Microsoft), V2 outperforms V1 on every model tested, with improvements ranging from +0.15 to +0.46 (out of 3.0), and the largest gains on the weakest summarisers.
 
 Combined with a KV-cache-persistent session worker that eliminates redundant prompt re-processing across rounds, the approach enables unbounded tool-calling depth on a 16K context window while maintaining response quality. Both techniques are deployed in production: measured forgetting in a Tauri desktop application (B.app, Qwen3 8B, M4 Mac), and a variant of the compaction protocol in a cloud-hosted chat orchestrator. Code and benchmark harness: \url{https://github.com/cif-ai/measured-forgetting}.
 \end{abstract}
@@ -97,7 +97,7 @@ Combined with a KV-cache-persistent session worker that eliminates redundant pro
 
 A local LLM acting as an agent follows a pattern: the user asks a question, the model generates a response containing a tool call, the orchestrator executes the tool, injects the result, and the model generates again. Each round appends two messages (assistant response + tool result), typically 200--800 tokens each. On a 16K context window with a 2K system prompt, the usable budget is $\sim$14K tokens. At 400 tokens per round-trip, context fills in $\sim$17 rounds --- but quality degrades well before that, as attention dilutes across the growing history.
 
-In practice, we observed reliable degradation after 4--5 tool rounds on Qwen3 8B (8K context) and 6--8 rounds on Qwen3.5 9B (16K context). The failure mode is not a crash --- it is \emph{confabulation}. The model starts generating plausible-sounding responses that ignore the tool results, because the relevant data has been pushed too far back in the context.
+In practice, we observed reliable degradation after 4--5 tool rounds on Qwen3 8B (8K context) and 6--8 rounds on the same model at 16K context. The failure mode is not a crash --- it is \emph{confabulation}. The model starts generating plausible-sounding responses that ignore the tool results, because the relevant data has been pushed too far back in the context.
 
 \subsection{Fixed round limits are the wrong abstraction}
 
@@ -340,9 +340,11 @@ let reused = prefix_len.min(*n_past as usize);
 let new_tokens = &tokens[reused..];
 
 if reused < *n_past as usize {
-    // Prompt diverged -- trim KV cache from divergence point
-    ctx.clear_kv_cache_seq(Some(0), Some(reused as u32), None);
-    *n_past = reused as i32;
+    // Prompt diverged. M-RoPE models (e.g. Qwen) require
+    // strictly increasing positions, so a partial trim
+    // corrupts position state -- clear the whole cache.
+    ctx.clear_kv_cache();
+    *n_past = 0;
 }
 \end{lstlisting}
 
@@ -350,7 +352,7 @@ if reused < *n_past as usize {
 
 \begin{enumerate}
   \item \textbf{Extension} ($\texttt{reused} = n_{\text{past}}$): The new prompt is a strict extension of the old. Only the new tokens need decoding. This is the common case in tool-calling loops.
-  \item \textbf{Divergence} ($\texttt{reused} < n_{\text{past}}$): The new prompt diverges from the cached version. The KV cache is trimmed from the divergence point, and the divergent suffix is re-decoded. This handles compaction --- after the message history is restructured, the worker re-decodes only the changed portion.
+  \item \textbf{Divergence} ($\texttt{reused} < n_{\text{past}}$): The new prompt diverges from the cached version. Because the deployed models use M-RoPE (which requires strictly increasing KV positions), a partial trim would corrupt position state; the cache is therefore cleared in full and the new prompt re-decoded from scratch. This is the case that fires after compaction restructures the message history --- compaction trades a one-time full re-decode for a fresh context budget.
   \item \textbf{Exact match} (\texttt{new\_tokens} is empty): The prompt is identical. The worker skips decoding and proceeds to sampling.
 \end{enumerate}
 
@@ -372,8 +374,8 @@ Measured forgetting and KV persistence are complementary, not competing.
 \begin{enumerate}
   \item The model runs tool rounds, accumulating context.
   \item KV persistence ensures each round only decodes the new tool result ($\sim$200--400 tokens), not the full history.
-  \item When context crosses the 75\% threshold, measured forgetting compresses the middle zone.
-  \item The compression changes the prompt, causing the KV cache to partially invalidate --- but the pinned zone (system prompt + question) remains cached, so only the restructured portion needs re-processing.
+  \item When context crosses the compaction threshold ($\frac{3}{4}$ of the usable budget $C-G$), measured forgetting compresses the middle zone.
+  \item The compression rewrites the message history below the pinned prefix; because M-RoPE forbids a partial KV trim, the cache is cleared and the (now much shorter) restructured prompt is re-decoded once.
   \item The model continues with a fresh context budget, and KV persistence resumes saving decode time on subsequent rounds.
 \end{enumerate}
 
@@ -460,21 +462,21 @@ Three compression strategies are compared:
 \textbf{Model} & \textbf{Family} & \textbf{Baseline} & \textbf{V1} & \textbf{V2} & \textbf{V2$-$V1} \\
 \midrule
 Qwen3 8B & Alibaba & 0.50 & 0.35 & \textbf{0.81} & +0.46 \\
-Phi-4 mini 3.8B & Microsoft & 2.02 & 2.58 & \textbf{2.98} & +0.40 \\
+Phi-4 mini 3.8B & Microsoft & 2.02 & 2.67 & \textbf{2.94} & +0.27 \\
 Llama 3.2 3B & Meta & 1.67 & 2.69 & \textbf{2.90} & +0.21 \\
 Mistral 7B & Mistral & 2.06 & 2.69 & \textbf{2.85} & +0.17 \\
 Qwen2.5 7B & Alibaba & 1.90 & 2.79 & \textbf{2.94} & +0.15 \\
 Gemma 3 4B & Google & 1.83 & 2.69 & \textbf{2.83} & +0.15 \\
 Mistral-Nemo 12B & Mistral & 1.85 & 2.71 & \textbf{2.85} & +0.15 \\
 \midrule
-\textbf{Mean} & & \textbf{1.69} & \textbf{2.36} & \textbf{2.59} & \textbf{+0.24} \\
+\textbf{Mean} & & \textbf{1.69} & \textbf{2.37} & \textbf{2.59} & \textbf{+0.22} \\
 \bottomrule
 \end{tabular}
-\caption{Retention scores (out of 3.0) across 7 models from 5 independent families, 18 scenarios, 47 probes per model. V2 outperforms V1 on all 7 models with zero regressions. Sorted by V2$-$V1 delta.}
+\caption{Retention scores (out of 3.0) across 7 models from 5 independent families, 18 scenarios, 48 probes per model. V2 outperforms V1 on all 7 models with zero regressions. Sorted by V2$-$V1 delta.}
 \label{tab:overall}
 \end{table}
 
-\noindent V2 outperforms V1 on every model tested (sign test: 7/7 positive, $p = 0.008$). The mean improvement is +0.24 (10\% relative), with the largest gain on the weakest summariser (+0.46 on Qwen3 8B, a 131\% relative improvement). Directional evidence suggests an inverse capability relationship ($r = -0.77$, $p = 0.043$, $n=7$): dimension-aware compression provides the largest benefit precisely where uniform summarisation is weakest. We note that $n=7$ is too small for robust correlation claims; the sign test (which requires only direction, not magnitude) provides the stronger statistical grounding.
+\noindent V2 outperforms V1 on every model tested (sign test: 7/7 positive, $p = 0.008$). The mean improvement is +0.22 (9\% relative), with the largest gain on the weakest summariser (+0.46 on Qwen3 8B, a 131\% relative improvement). Directional evidence suggests an inverse capability relationship ($r = -0.93$, $p = 0.003$, $n=7$): dimension-aware compression provides the largest benefit precisely where uniform summarisation is weakest. We note that $n=7$ is too small for robust correlation claims; the sign test (which requires only direction, not magnitude) provides the stronger statistical grounding.
 
 Table~\ref{tab:class} breaks down performance by problem class (mean across all 7 models):
 
@@ -484,15 +486,15 @@ Table~\ref{tab:class} breaks down performance by problem class (mean across all 
 \toprule
 \textbf{Problem Class} & \textbf{Baseline} & \textbf{V1} & \textbf{V2} & \textbf{Note} \\
 \midrule
-Lookup & 1.24 & 2.64 & \textbf{3.00} & Influence identifies the answer \\
-Multi-hop & 1.18 & 2.30 & \textbf{2.64} & Chain detection preserves path \\
-Temporal & 1.35 & 2.48 & \textbf{2.77} & Dimension scoring preserves dates \\
-Exploratory & 2.11 & 2.84 & \textbf{2.86} & V2 matches V1 (already strong) \\
-Aggregation & 2.03 & 2.90 & \textbf{2.84} & Near-tied (single-dim data) \\
-Contradiction & 2.64 & 2.66 & \textbf{2.86} & Dual-path preservation helps \\
+Lookup & 1.26 & 2.31 & \textbf{2.90} & Influence identifies the answer \\
+Multi-hop & 1.10 & 1.97 & \textbf{2.52} & Chain detection preserves path \\
+Temporal & 1.41 & 2.35 & \textbf{2.52} & Dimension scoring preserves dates \\
+Exploratory & 1.96 & 2.54 & \textbf{2.54} & V2 matches V1 (already strong) \\
+Aggregation & 1.94 & \textbf{2.60} & 2.56 & V1 edges V2 (single-dim data) \\
+Contradiction & 2.55 & 2.47 & \textbf{2.59} & Dual-path preservation helps \\
 \bottomrule
 \end{tabular}
-\caption{Retention score by problem class (mean across all 7 models). V2 dominates on structured problems: lookup (+0.36 over V1), multi-hop (+0.34), and temporal (+0.29). The advantage narrows on exploratory and aggregation where V1 already captures the sufficient statistic.}
+\caption{Retention score by problem class (mean across all 7 models). V2's largest gains are on structured problems: lookup (+0.59 over V1) and multi-hop (+0.55), with a smaller gain on temporal (+0.17). The advantage vanishes on exploratory (tied) and slightly reverses on aggregation ($-0.04$), where V1 already captures the sufficient statistic.}
 \label{tab:class}
 \end{table}
 
@@ -502,14 +504,14 @@ Contradiction & 2.64 & 2.66 & \textbf{2.86} & Dual-path preservation helps \\
 \toprule
 \textbf{Probe Dimension} & \textbf{Baseline} & \textbf{V1} & \textbf{V2} \\
 \midrule
-Entity recall & 1.29 & 1.43 & \textbf{3.00} \\
-Fact retention & 1.65 & 2.63 & \textbf{2.89} \\
-Contradiction awareness & 2.38 & 2.62 & \textbf{3.00} \\
-Temporal ordering & 1.03 & 2.26 & \textbf{2.63} \\
-Causal fidelity & 2.05 & 2.55 & \textbf{2.60} \\
+Entity recall & 1.21 & 1.21 & \textbf{3.00} \\
+Fact retention & 1.68 & 2.46 & \textbf{2.66} \\
+Contradiction awareness & 2.24 & 2.33 & \textbf{2.57} \\
+Temporal ordering & 1.11 & 2.23 & \textbf{2.31} \\
+Causal fidelity & 1.89 & 2.44 & \textbf{2.49} \\
 \bottomrule
 \end{tabular}
-\caption{Retention score by probe dimension (mean across 7 models). V2 achieves perfect scores on entity recall and contradiction awareness. The preserved-verbatim tier is the primary mechanism: proper nouns and conflicting data points score high on the Influence Equation and are kept intact.}
+\caption{Retention score by probe dimension (mean across 7 models). V2 achieves a perfect score on entity recall (3.00 across all 7 models) and wins on every dimension. The preserved-verbatim tier is the primary mechanism: proper nouns and conflicting data points score high on the Influence Equation and are kept intact.}
 \label{tab:dim}
 \end{table}
 
@@ -517,9 +519,9 @@ Causal fidelity & 2.05 & 2.55 & \textbf{2.60} \\
 
 Three patterns emerge from the 7-model comparison:
 
-\textbf{1. Inverse capability relationship.} The weaker the model's baseline summarisation ability, the larger the V2 improvement. Qwen3 8B (V1=0.35, a poor summariser due to thinking-token overhead) gains +0.46 from V2. Phi-4 mini (V1=2.58) gains +0.40. Models already near ceiling (Qwen2.5 at V1=2.79) gain only +0.15. The direction is consistent across all 7 models; the Pearson correlation ($r = -0.77$, $n=7$) provides directional evidence but should be interpreted cautiously given the small sample. Dimension-aware compression does for weak models what strong models do naturally --- preserve the sufficient statistic.
+\textbf{1. Inverse capability relationship.} The weaker the model's baseline summarisation ability, the larger the V2 improvement. Qwen3 8B (V1=0.35, a poor summariser due to thinking-token overhead) gains +0.46 from V2. Phi-4 mini (V1=2.67) gains +0.27. Models already near ceiling (Qwen2.5 at V1=2.79) gain only +0.15. The direction is consistent across all 7 models; the Pearson correlation ($r = -0.93$, $n=7$) provides directional evidence but should be interpreted cautiously given the small sample. Dimension-aware compression does for weak models what strong models do naturally --- preserve the sufficient statistic.
 
-\textbf{2. Entity recall is the clearest mechanism.} V2 achieves perfect 3.0 on entity recall across all 7 models, vs 1.43 for V1. The preserved-verbatim tier is the cause: proper nouns and identifiers appear in multi-dimensional messages (data + entity + task-reference), triggering the $\Phi$ boost and verbatim preservation. V1 summarisation consistently paraphrases away entity specifics.
+\textbf{2. Entity recall is the clearest mechanism.} V2 achieves perfect 3.0 on entity recall across all 7 models, vs 1.21 for V1. The preserved-verbatim tier is the cause: proper nouns and identifiers appear in multi-dimensional messages (data + entity + task-reference), triggering the $\Phi$ boost and verbatim preservation. V1 summarisation consistently paraphrases away entity specifics.
 
 \textbf{3. Thinking-mode models are penalised.} Qwen3 8B (the only thinking-mode model tested) scores dramatically lower across all conditions. Its V2 score (0.81) is below every other model's V1 score. The model spends response tokens on \texttt{<think>} blocks rather than answering the probe question directly. This is a model-level issue orthogonal to compression quality, but relevant for practitioners choosing between thinking and non-thinking variants.
 
@@ -545,9 +547,9 @@ Ratio vs.\ original & 100\% & 19\% & 96\% & 97\% \\
 
 \subsection{Remaining gaps}
 
-\textbf{Aggregation parity:} V2 scores 2.84 vs V1's 2.90 on aggregation --- the only class where V2 does not clearly win. Aggregation data hits a single dimension (data), preventing the super-linear $\Phi$ boost. A class-specific override is the natural fix.
+\textbf{Aggregation parity:} V2 scores 2.56 vs V1's 2.60 on aggregation --- the only class where V2 does not win. Aggregation data hits a single dimension (data), preventing the super-linear $\Phi$ boost. A class-specific override is the natural fix.
 
-\textbf{Causal fidelity ceiling:} V2 improves causal fidelity only marginally over V1 (2.60 vs 2.55). The ``why'' explanation often lives in assistant messages with low multi-dimensional scores. Semantic dependency detection (beyond structural tool-result $\to$ interpretation links) remains an open problem.
+\textbf{Causal fidelity ceiling:} V2 improves causal fidelity only marginally over V1 (2.49 vs 2.44). The ``why'' explanation often lives in assistant messages with low multi-dimensional scores. Semantic dependency detection (beyond structural tool-result $\to$ interpretation links) remains an open problem.
 
 We report v2.0 as a baseline with acknowledged gaps, enabling future ablation studies on $\Phi$ overrides and semantic chain detection.
 
@@ -646,7 +648,7 @@ The deeper principle is information-theoretic: in any system with finite memory,
     3.~Parse tool call\\
     4.~Execute tool\\
     5.~Check: loop? error? ctx?\\
-    6.~If ctx $>$ 75\%: \textsc{Compact}\\
+    6.~If ctx $> T_{\text{compact}}$: \textsc{Compact}\\
     7.~Goto 2
   };
 
@@ -654,7 +656,7 @@ The deeper principle is information-theoretic: in any system with finite memory,
   \node[box, fill=green!8] (worker) at (5.5, -3.5) {SessionWorker\\[-2pt]\footnotesize KV cache persists\\[-2pt]\footnotesize prefix matching\\[-2pt]\footnotesize incremental decode};
 
   % llama.cpp
-  \node[box, fill=purple!8] (llama) at (5.5, -6.0) {llama.cpp + Metal\\[-2pt]\footnotesize Qwen3.5 9B Q4\_K\_M};
+  \node[box, fill=purple!8] (llama) at (5.5, -6.0) {llama.cpp + Metal\\[-2pt]\footnotesize Qwen3 8B Q4\_K\_M};
 
   % Tauri shell
   \node[bigbox, fit=(orch)(loop)(worker)(llama), label={[font=\small\bfseries]above:B.app (Tauri)}] {};
@@ -700,7 +702,7 @@ The compression ratio achieved is:
 \section{Production Trace: Annotated Case Study}
 \label{sec:trace}
 
-The following is a lightly edited trace from B.app (Qwen3 8B, M4 Mac) during a real multi-tool investigation. The user asked: ``What's the current price of GBPUSD and what was the 24h change?'' The model dispatched tool calls to a forex API.
+The following is an illustrative trace --- representative of B.app (Qwen3 8B, M4 Mac) behaviour during a multi-tool investigation, with token counts rounded for exposition. The user asked: ``What's the current price of GBPUSD and what was the 24h change?'' The model dispatched tool calls to a forex API.
 
 \begin{small}
 \begin{verbatim}
@@ -714,18 +716,18 @@ Round 3: [assistant] Interprets: GBPUSD at 1.3342, 24h open
 Round 4: [tool_call] oanda_sentiment("GBPUSD")
          [tool_result] {"long_pct":38.2,"short_pct":61.8}
 Round 5: [assistant] Adds sentiment context to answer.
------ context utilisation: 11,847 / 12,288 (96%) -----
+----- context: 10,910 / 16,384; exceeds T_compact = 10,752 -----
 ----- COMPACTION FIRES -----
 \end{verbatim}
 \end{small}
 
-\noindent At round 5, context crosses the 75\% threshold (Eq.~\ref{eq:threshold}). The v2 algorithm analyses the 5 intermediate messages:
+\noindent Once context crosses the compaction threshold $T_{\text{compact}} = \frac{3}{4}(C-G)$ (Eq.~\ref{eq:threshold}), compaction fires. The v2 algorithm analyses the 5 intermediate messages:
 
 \begin{small}
 \begin{verbatim}
 Message scores (Influence Equation):
   Round 1 result: I=4.2 (data+entity+task: 3 dims, Phi=5.2)
-  Round 2 result: I=1.8 (data only: 1 dim, Phi=1.0)  ← 2100 tokens
+  Round 2 result: I=1.8 (data only: 1 dim, Phi=1.0)  <- 2100 tokens
   Round 3 assist: I=6.1 (data+causal+task+temporal: 4 dims, Phi=8.0)
   Round 4 result: I=2.3 (data+entity: 2 dims, Phi=2.8)
   Round 5 assist: I=3.9 (data+causal+task: 3 dims, Phi=5.2)
@@ -741,7 +743,7 @@ Tier assignment:
 
 \textbf{V2 outcome:} Round 3 (the interpretation) preserved verbatim. Round 2 (the 2100-token candle array) collapsed to one line. Summariser receives 60\% less text but the key numbers survive intact. Post-compaction probe: ``What was the 24h change?'' $\to$ ``+0.0044 (+0.33\%), open 1.3298, current 1.3342'' (score: 3, correct with specifics).
 
-\noindent The compacted context is 3,200 tokens (from 11,847) --- a 73\% reduction. The model continues with a fresh budget, and KV persistence means only the restructured portion needs re-decoding (the 2,400-token system prompt + question prefix is cached).
+\noindent The compacted context is 3,200 tokens (from 10,910) --- a 71\% reduction. The model continues with a fresh budget; because the prompt diverged at the compression point, this one compaction triggers a full re-decode of the (now much shorter) restructured prompt, after which KV persistence resumes on subsequent rounds.
 
 % ══════════════════════════════════════════════════════════════════════
 
